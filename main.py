@@ -16,10 +16,8 @@ REPETICIONES: int = 5
 LISTADEOPCIONES: tuple[str] = ("100", "1000", "10000", "100000")
 diccionario_algoritmo_tiempo = {}
 
-diccionario_algoritmo_tiempo['lineal'] = np.zeros(shape=len(LISTADEOPCIONES), dtype="uint32")
-diccionario_algoritmo_tiempo['binario'] = np.zeros(shape=len(LISTADEOPCIONES), dtype="uint32")
-
-diccionario_barras = {'lineal': None, 'binario': None}
+diccionario_algoritmo_tiempo['lineal'] = np.zeros(shape=len(LISTADEOPCIONES), dtype="float64")
+diccionario_algoritmo_tiempo['binario'] = np.zeros(shape=len(LISTADEOPCIONES), dtype="float64")
 
 def generar_datos(envoltura) -> None:
         boton_busqueda_binaria.configure(state="active")
@@ -34,20 +32,45 @@ def generar_datos(envoltura) -> None:
 
 def busqueda_lineal():
         dato = int(numero_a_buscar.get())
-        tiempo_promedio: int = 0
-        for r in range(REPETICIONES):
+        tiempo_promedio: float = 0
+        for reps in range(REPETICIONES):
                 tiempo_inicial = time.perf_counter()
                 for i, _dato in enumerate(interfaz_datos[0]):
                         if dato == _dato:
                                 break
                 tiempo_final = time.perf_counter()
                 tiempo_promedio = tiempo_promedio + tiempo_final - tiempo_inicial
-        lista_datos.yview_scroll(i, "units")
+        lista_datos.yview_moveto(float(i/lista_datos.size()))
         tiempo_promedio = tiempo_promedio / REPETICIONES
-        #diccionario_barras["lineal"][LISTADEOPCIONES.index(lista_datos.get())].
+        tiempo_promedio = tiempo_promedio * 1000
+        global diccionario_algoritmo_tiempo
+        diccionario_algoritmo_tiempo["lineal"][LISTADEOPCIONES.index(str(lista_datos.size()))] = tiempo_promedio
+        actualizar_grafica()
                 
-def busqueda_binaria(lista: list[int], dato:int):
-        raise NotImplementedError 
+def busqueda_binaria():
+        dato = int(numero_a_buscar.get())
+        tiempo_promedio: float = 0
+        for reps in range(REPETICIONES):
+                tiempo_inicial = time.perf_counter()
+                r = interfaz_datos[0].shape[0] - 1
+                l = 0
+                while r > l:
+                        m = int((r + l) / 2)
+                        print(l, m, r)
+                        if interfaz_datos[0][m] == dato:
+                                break
+                        elif interfaz_datos[0][m] < dato:
+                                l = m + 1
+                        else:
+                                r = m - 1
+                tiempo_final = time.perf_counter()
+                tiempo_promedio = tiempo_promedio + tiempo_final - tiempo_inicial
+        lista_datos.yview_moveto(float(m/lista_datos.size()))
+        tiempo_promedio = tiempo_promedio / REPETICIONES
+        tiempo_promedio = tiempo_promedio * 1000
+        global diccionario_algoritmo_tiempo
+        diccionario_algoritmo_tiempo["binario"][LISTADEOPCIONES.index(str(lista_datos.size()))] = tiempo_promedio
+        actualizar_grafica()
 
 def revisar_si_es_numero(nuevoValor:int)->bool:
         return re.match('^[0-9]*$', nuevoValor) is not None 
@@ -55,6 +78,26 @@ def revisar_si_es_numero(nuevoValor:int)->bool:
 def aumentar_tamano_array(envoltura):
         envoltura[0] = np.resize(envoltura[0], int(tamano_Lista.get()))
         return envoltura
+
+def actualizar_grafica():
+        global figura
+        figura.clear()
+        grafica = figura.add_subplot()
+        x = np.arange(len(LISTADEOPCIONES))
+        offset = 0
+        w = 0.4
+        for algoritmo, tiempos in diccionario_algoritmo_tiempo.items():
+                g = grafica.bar(x + offset, tiempos, data=tiempos, label=algoritmo, width=w)
+                grafica.bar_label(g, labels=[f"{t:.3f}" for t in tiempos], padding = 0, label_type="edge", color = "b" if algoritmo == "lineal" else "r")
+                offset += w
+        grafica.set_title("Tiempo promedio de los algoritmos")
+        grafica.legend()         
+        grafica.set_xlabel("Cantidad de elementos")
+        grafica.set_ylabel("Tiempo promedio (ms)")
+        grafica.set_xticks(x+w/2, LISTADEOPCIONES)
+        
+        global grafica_embebido
+        grafica_embebido.draw()
 
 if __name__ == "__main__":
         datos: npt.ArrayLike = np.empty(shape=100, dtype="int32")
@@ -105,23 +148,11 @@ if __name__ == "__main__":
         boton_busqueda_binaria = tk.Button(frame_opciones_busqueda, text="Busqueda binaria", command=busqueda_binaria, state="disabled")
         boton_busqueda_binaria.grid(column=1, row=0, padx=5)
         
-        figura = Figure(figsize=(6, 4), dpi=100)
-        grafica = figura.add_subplot()
-        for algoritmo, tiempo in diccionario_algoritmo_tiempo.items():
-                diccionario_barras[algoritmo] = grafica.bar(LISTADEOPCIONES, tiempo, data=tiempo, label=algoritmo)
-        grafica.set_title("Tiempo promedio de los algoritmos")
-        grafica.legend()         
-        grafica.set_xlabel("Cantidad de elementos")
-        grafica.set_ylabel("Tiempo promedio")
-        
-        diccionario_algoritmo_tiempo["lineal"][0] = 9
-        
-        for algoritmo, tiempo in diccionario_algoritmo_tiempo.items():
-                diccionario_barras[algoritmo] = grafica.bar(LISTADEOPCIONES, tiempo, data=tiempo, label=algoritmo)
-        grafica.legend()    
-        
+        figura = Figure(figsize=(6, 4), dpi=100, layout="constrained")
         grafica_embebido = FigureCanvasTkAgg(figura, contenido)
-        grafica_embebido.draw()
+        
+        actualizar_grafica()
+        
         grafica_embebido.get_tk_widget().grid(column=1,row=1, sticky='se', rowspan=5)
         
         tamano_Lista.set(LISTADEOPCIONES[0])

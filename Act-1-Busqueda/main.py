@@ -174,15 +174,17 @@ if __name__ == "__main__":
         
         grafica_embebido.get_tk_widget().grid(column=1,row=1, sticky='snwe', rowspan=5)
         
-        ventana.rowconfigure(0, weight=1)
-        ventana.columnconfigure(0, weight=1)
+        ventana.rowconfigure(0, weight=1, minsize=500)
+        ventana.columnconfigure(0, weight=1, minsize=1000)
         
         contenido.rowconfigure(0, weight=0)
         contenido.columnconfigure(0, minsize=400, weight=0)
         contenido.rowconfigure(2, weight=1, minsize=250)
-        contenido.columnconfigure(1, minsize=400, weight=1)
+        contenido.columnconfigure(1, minsize=600, weight=1)
         frame_lista_datos.rowconfigure(0, weight=1)
         frame_lista_datos.columnconfigure(0, weight=1)
+        
+        ventana.minsize(1000,500)
         
         tamano_Lista.set(LISTADEOPCIONES[0])
         ventana.mainloop()

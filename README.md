@@ -1,4 +1,4 @@
-- [1. Curso analisis de algoritmos](#1-curso-analisis-de-algoritmos)
+- [1. Introducción al curso](#1-introducción-al-curso)
 - [2. Actividad 1 - Busqueda](#2-actividad-1---busqueda)
   - [2.1. Ejecución](#21-ejecución)
     - [2.1.1. Librerias](#211-librerias)
@@ -8,8 +8,7 @@
   - [4.1. Ejecución](#41-ejecución)
     - [4.1.1. Librerias](#411-librerias)
 
-
-# 1. Curso analisis de algoritmos
+# 1. Introducción al curso
 
 Este repositorio contiene todas las actividades realizadas por mi en la materia de analisis de algoritmos.
 
@@ -33,8 +32,6 @@ La practica consistió en el desarrollo de 2 ambos algoritmos mencionados en el 
 
 ## 3.1. Ejecución
 No existe ninguna nota para le ejecución de este programa.
-
-
 
 # 4. Participación - Fibonacci
 

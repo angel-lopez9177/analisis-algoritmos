@@ -28,20 +28,22 @@ class App:
 
         left_panel = ttk.Frame(main_frame, style="App.TFrame")
         left_panel.grid(row=0, column=0, sticky="nsew", padx=(0, 10))
+        # --- NUEVO: Configurar fila 5 para que expanda ---
+        left_panel.grid_rowconfigure(5, weight=1) 
+
 
         # --- Panel de NCBI ---
         ncbi_frame = ttk.Frame(left_panel, style="App.TFrame")
-        ncbi_frame.pack(fill="x", pady=(0, 10))
+        # --- MODIFICADO: Usar grid en lugar de pack ---
+        ncbi_frame.grid(row=0, column=0, sticky="ew", pady=(0, 10))
         
         ttk.Label(ncbi_frame, text="Obtener de NCBI (Nucleotide DB):", font=("Segoe UI", 10, "bold")).grid(row=0, column=0, columnspan=4, sticky="w", pady=4)
         
-        # --- Fila 1: Acceso 1 ---
         ttk.Label(ncbi_frame, text="Acceso 1:").grid(row=1, column=0, sticky="w", pady=2)
         self.entry_acc1 = ttk.Entry(ncbi_frame, width=20, font=("Segoe UI", 10))
         self.entry_acc1.grid(row=1, column=1, padx=6, pady=4, columnspan=3, sticky="ew")
         self.entry_acc1.insert(0, "NM_000520.6") 
         
-        # --- Fila 2: Rangos Carga 1 ---
         ttk.Label(ncbi_frame, text="Cargar Inicio 1:").grid(row=2, column=0, sticky="w", padx=(10,0))
         self.entry_fetch1_start = ttk.Entry(ncbi_frame, width=8, font=("Segoe UI", 10))
         self.entry_fetch1_start.grid(row=2, column=1, padx=5, pady=2, sticky="w")
@@ -51,13 +53,11 @@ class App:
         self.entry_fetch1_end.grid(row=2, column=3, padx=5, pady=2, sticky="w")
         self.entry_fetch1_end.insert(0, "100") 
 
-        # --- Fila 3: Acceso 2 ---
         ttk.Label(ncbi_frame, text="Acceso 2:").grid(row=3, column=0, sticky="w", pady=2)
         self.entry_acc2 = ttk.Entry(ncbi_frame, width=20, font=("Segoe UI", 10))
         self.entry_acc2.grid(row=3, column=1, padx=6, pady=4, columnspan=3, sticky="ew")
         self.entry_acc2.insert(0, "NM_001126111.3")
 
-        # --- Fila 4: Rangos Carga 2 ---
         ttk.Label(ncbi_frame, text="Cargar Inicio 2:").grid(row=4, column=0, sticky="w", padx=(10,0))
         self.entry_fetch2_start = ttk.Entry(ncbi_frame, width=8, font=("Segoe UI", 10))
         self.entry_fetch2_start.grid(row=4, column=1, padx=5, pady=2, sticky="w")
@@ -67,14 +67,13 @@ class App:
         self.entry_fetch2_end.grid(row=4, column=3, padx=5, pady=2, sticky="w")
         self.entry_fetch2_end.insert(0, "100") 
 
-        # --- Fila 5: Botón ---
         ttk.Button(ncbi_frame, text="Obtener Secuencias", command=self.on_fetch_ncbi).grid(row=5, column=0, columnspan=4, sticky="ew", pady=5)
         
-        ttk.Separator(left_panel, orient='horizontal').pack(fill='x', pady=10)
+        ttk.Separator(left_panel, orient='horizontal').grid(row=1, column=0, sticky="ew", pady=10)
         
-        # --- Contenedor de entradas (Sin cambios) ---
+        # --- Contenedor de entradas ---
         inputs = ttk.Frame(left_panel, style="App.TFrame")
-        inputs.pack(fill="x", pady=(0, 10))
+        inputs.grid(row=2, column=0, sticky="ew", pady=(0, 10))
         inputs.grid_columnconfigure(1, weight=1) 
         
         ttk.Label(inputs, text="Cadena 1:").grid(row=0, column=0, sticky="w", pady=2)
@@ -101,26 +100,63 @@ class App:
         self.entry_Y_end = ttk.Entry(inputs, width=6, font=("Segoe UI", 10))
         self.entry_Y_end.grid(row=1, column=5, padx=5, pady=4)
 
-        # --- Resto de la UI (Sin cambios) ---
+        # --- Controles ---
         controls = ttk.Frame(left_panel, style="App.TFrame")
-        controls.pack(fill="x", pady=8)
+        controls.grid(row=3, column=0, sticky="ew", pady=8)
         self.anim_var = tk.BooleanVar(value=True)
         ttk.Checkbutton(controls, text="Animar tabla", variable=self.anim_var).pack(side="left")
         ttk.Button(controls, text="Calcular y Comparar", command=self.on_calcular).pack(side="left", padx=12)
         ttk.Button(controls, text="Limpiar", command=self.on_limpiar).pack(side="left")
         
+        # --- Resultados ---
         self.result_label = ttk.Label(left_panel, text="Resultados aparecerán aquí.", justify="left", anchor="w")
-        self.result_label.pack(fill="x", pady=(10, 5))
+        self.result_label.grid(row=4, column=0, sticky="ew", pady=(10, 5))
 
+        # --- Frame para la animación de la tabla (AHORA SCROLLABLE) ---
+        # 1. Contenedor principal para canvas y scrollbars
         self.animation_frame = ttk.Frame(left_panel, style="App.TFrame")
-        self.animation_frame.pack(fill="both", expand=True, pady=(10,0))
+        self.animation_frame.grid(row=5, column=0, sticky="nsew", pady=(10,0))
+        self.animation_frame.grid_rowconfigure(0, weight=1)
+        self.animation_frame.grid_columnconfigure(0, weight=1)
 
+        # 2. Crear Canvas
+        self.anim_canvas = tk.Canvas(self.animation_frame, bg=self.colors["bg"], highlightthickness=0)
+        
+        # 3. Crear Scrollbars
+        v_scroll = ttk.Scrollbar(self.animation_frame, orient="vertical", command=self.anim_canvas.yview)
+        h_scroll = ttk.Scrollbar(self.animation_frame, orient="horizontal", command=self.anim_canvas.xview)
+        
+        # 4. Configurar el Canvas para que use los scrollbars
+        self.anim_canvas.configure(yscrollcommand=v_scroll.set, xscrollcommand=h_scroll.set)
+
+        # 5. Colocar Canvas y Scrollbars en el grid de animation_frame
+        self.anim_canvas.grid(row=0, column=0, sticky="nsew")
+        v_scroll.grid(row=0, column=1, sticky="ns")
+        h_scroll.grid(row=1, column=0, sticky="ew")
+
+        # 6. Crear el frame de contenido INTERNO (donde irá la tabla)
+        self.animation_grid_frame = ttk.Frame(self.anim_canvas, style="App.TFrame")
+
+        # 7. Colocar el frame de contenido DENTRO del canvas
+        self.anim_canvas.create_window((0, 0), window=self.animation_grid_frame, anchor="nw")
+
+        # 8. BINDING: Actualizar el scrollregion cuando el tamaño del frame interno cambie
+        self.animation_grid_frame.bind("<Configure>", self.on_frame_configure)
+        
+        # --- Panel Derecho (Gráficas) ---
         self.right_panel = ttk.Frame(main_frame, style="App.TFrame")
         self.right_panel.grid(row=0, column=1, sticky="nsew")
         
         self.anim_after_id = None
 
+    # --- NUEVA FUNCIÓN AUXILIAR PARA EL SCROLL ---
+    def on_frame_configure(self, event):
+        """Actualiza el scrollregion del canvas para que coincida con el frame interno."""
+        self.anim_canvas.configure(scrollregion=self.anim_canvas.bbox("all"))
+
+
     def setup_styles(self):
+        # --- (Esta función no tiene cambios) ---
         style = ttk.Style()
         style.theme_use('clam')
         style.configure(".", background=self.colors["bg"], foreground=self.colors["text"], font=("Segoe UI", 10))
@@ -134,7 +170,7 @@ class App:
         style.configure("TEntry", fieldbackground=self.colors["panel"], foreground=self.colors["text"], borderwidth=1, insertcolor=self.colors["text"])
         
     def on_limpiar(self):
-        # --- (Esta función no tiene cambios) ---
+        # --- (Función casi sin cambios) ---
         self.entry_X.delete(0, tk.END)
         self.entry_Y.delete(0, tk.END)
         self.entry_acc1.delete(0, tk.END)
@@ -151,8 +187,13 @@ class App:
         self.entry_fetch2_end.delete(0, tk.END)
         
         self.result_label.config(text="Resultados aparecerán aquí.")
-        for w in self.animation_frame.winfo_children():
+        
+        # --- MODIFICADO para el scroll area ---
+        for w in self.animation_grid_frame.winfo_children():
             w.destroy()
+        # Resetear el scrollregion
+        self.anim_canvas.configure(scrollregion=(0, 0, 0, 0))
+        
         for w in self.right_panel.winfo_children():
             w.destroy()
 
@@ -256,7 +297,7 @@ class App:
             return None, None
         
     def on_calcular(self):
-        # --- (Esta función no tiene cambios) ---
+        # --- (Función casi sin cambios) ---
         X, Y = self._get_sliced_strings()
         
         if X is None or Y is None:
@@ -265,8 +306,12 @@ class App:
             messagebox.showerror("Error", "Ingresa ambas cadenas, o verifica que los índices no resulten en una cadena vacía.")
             return
 
-        for w in self.animation_frame.winfo_children():
+        # --- MODIFICADO: Limpiar el frame INTERNO ---
+        for w in self.animation_grid_frame.winfo_children():
             w.destroy()
+        # Resetear el scrollregion
+        self.anim_canvas.configure(scrollregion=(0, 0, 0, 0))
+
         for w in self.right_panel.winfo_children():
             w.destroy()
 
@@ -348,68 +393,65 @@ class App:
         canvas.draw()
         canvas.get_tk_widget().pack(fill="both", expand=True)
 
-    # --- animate_table (MODIFICADA Y CORREGIDA) ---
+    # --- animate_table (MODIFICADA) ---
     def animate_table(self, X, Y):
         if self.anim_after_id:
             self.root.after_cancel(self.anim_after_id)
             self.anim_after_id = None
-            
-        for w in self.animation_frame.winfo_children():
+        
+        # --- MODIFICADO: Limpiar el frame INTERNO ---
+        for w in self.animation_grid_frame.winfo_children():
             w.destroy()
+        # Resetear el scrollregion para la nueva tabla
+        self.anim_canvas.configure(scrollregion=(0, 0, 0, 0))
 
         m, n = len(X), len(Y)
-        # rows y cols son para la tabla L, que es (m+1) x (n+1)
         rows, cols = m + 1, n + 1 
         
-        # 'labels' almacenará las (m+1)x(n+1) etiquetas de la tabla L
         labels = [[None] * cols for _ in range(rows)] 
         
         # --- 1. Añadir esquina superior-izquierda (vacía) ---
-        # Colocada en (0,0)
-        lbl_corner = tk.Label(self.animation_frame, text=" ", width=4, height=2,
+        # --- MODIFICADO: Padre es 'animation_grid_frame' ---
+        lbl_corner = tk.Label(self.animation_grid_frame, text=" ", width=4, height=2,
                               bg=self.colors["bg"], relief="solid", borderwidth=1)
         lbl_corner.grid(row=0, column=0, padx=1, pady=1)
 
         # --- 2. Añadir encabezado Y (horizontal) ---
-        # Colocada en (fila 0, col 2), (fila 0, col 3), ...
         for j, char in enumerate(Y):
-            lbl_v = tk.Label(self.animation_frame, text=char, width=4, height=2,
+            # --- MODIFICADO: Padre es 'animation_grid_frame' ---
+            lbl_v = tk.Label(self.animation_grid_frame, text=char, width=4, height=2,
                              bg=self.colors["bg"], fg=self.colors["accent2"], font=("Consolas", 9, "bold"))
             lbl_v.grid(row=0, column=j + 2, padx=1, pady=1) # col=j+1
         
         # --- 3. Añadir encabezado X (vertical) ---
-        # Colocada en (fila 2, col 0), (fila 3, col 0), ...
         for i, char in enumerate(X):
-            lbl_h = tk.Label(self.animation_frame, text=char, width=4, height=2,
+            # --- MODIFICADO: Padre es 'animation_grid_frame' ---
+            lbl_h = tk.Label(self.animation_grid_frame, text=char, width=4, height=2,
                              bg=self.colors["bg"], fg=self.colors["accent2"], font=("Consolas", 9, "bold"))
             lbl_h.grid(row=i + 2, column=0, padx=1, pady=1) # row=i+1
 
         # --- 4. Crear celdas de la tabla L[i][j] (m+1)x(n+1) ---
-        # Colocadas en un offset (desplazamiento) de (1,1)
         for i in range(rows): # i de 0 a m
             for j in range(cols): # j de 0 a n
                 if i == 0 or j == 0:
-                    text = "0" # Las celdas de la fila/columna 0
-                    # --- CORRECCIÓN DE COLOR ---
+                    text = "0"
                     bg_color = self.colors["panel"] 
                 else:
-                    text = " " # Celdas de cálculo, inician vacías
+                    text = " "
                     bg_color = self.colors["panel"]
 
-                lbl = tk.Label(self.animation_frame, text=text, 
+                # --- MODIFICADO: Padre es 'animation_grid_frame' ---
+                lbl = tk.Label(self.animation_grid_frame, text=text, 
                                width=4, height=2, relief="solid", borderwidth=1,
                                bg=bg_color, fg=self.colors["text"],
                                font=("Consolas", 9))
                 
-                # Colocar L[i][j] en la celda del grid (i+1, j+1)
                 lbl.grid(row=i + 1, column=j + 1, padx=1, pady=1)
-                labels[i][j] = lbl # Guardar la etiqueta en nuestra matriz
+                labels[i][j] = lbl 
         
         # --- Lógica de animación (sin cambios) ---
         L = [[0] * (n + 1) for _ in range(m + 1)]
-        delay = 80 # ms
-
-        # 'steps' solo itera sobre las celdas de cálculo (no la fila/col 0)
+        delay = 80 
         steps = [(i, j) for i in range(1, m + 1) for j in range(1, n + 1)]
         state = {"index": 0, "steps": steps, "L": L, "labels": labels, "X": X, "Y": Y}
 
@@ -420,11 +462,9 @@ class App:
                     self.anim_after_id = None
                     return
 
-                i, j = state["steps"][idx] # i, j son de 1 a m/n
+                i, j = state["steps"][idx]
                 
-                # labels[i][j] es la etiqueta correcta para L[i][j]
                 if labels[i][j] is None:
-                    # Esto no debería pasar, pero es una guarda de seguridad
                     state["index"] += 1
                     self.anim_after_id = self.root.after(delay, step_animation)
                     return
@@ -439,7 +479,6 @@ class App:
                 state["index"] += 1
                 self.anim_after_id = self.root.after(delay, step_animation)
             except tk.TclError:
-                # La ventana fue cerrada o el widget destruido
                 self.anim_after_id = None
             except Exception as e:
                 print(f"Error en step_animation: {e}") 

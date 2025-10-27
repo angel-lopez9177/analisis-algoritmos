@@ -29,7 +29,7 @@ class App:
         left_panel = ttk.Frame(main_frame, style="App.TFrame")
         left_panel.grid(row=0, column=0, sticky="nsew", padx=(0, 10))
 
-        # --- Panel de NCBI (MODIFICADO) ---
+        # --- Panel de NCBI ---
         ncbi_frame = ttk.Frame(left_panel, style="App.TFrame")
         ncbi_frame.pack(fill="x", pady=(0, 10))
         
@@ -49,7 +49,7 @@ class App:
         ttk.Label(ncbi_frame, text="Cargar Fin 1:").grid(row=2, column=2, sticky="w", padx=(10,0))
         self.entry_fetch1_end = ttk.Entry(ncbi_frame, width=8, font=("Segoe UI", 10))
         self.entry_fetch1_end.grid(row=2, column=3, padx=5, pady=2, sticky="w")
-        self.entry_fetch1_end.insert(0, "100") # Ejemplo de 100 caracteres
+        self.entry_fetch1_end.insert(0, "100") 
 
         # --- Fila 3: Acceso 2 ---
         ttk.Label(ncbi_frame, text="Acceso 2:").grid(row=3, column=0, sticky="w", pady=2)
@@ -65,7 +65,7 @@ class App:
         ttk.Label(ncbi_frame, text="Cargar Fin 2:").grid(row=4, column=2, sticky="w", padx=(10,0))
         self.entry_fetch2_end = ttk.Entry(ncbi_frame, width=8, font=("Segoe UI", 10))
         self.entry_fetch2_end.grid(row=4, column=3, padx=5, pady=2, sticky="w")
-        self.entry_fetch2_end.insert(0, "100") # Ejemplo de 100 caracteres
+        self.entry_fetch2_end.insert(0, "100") 
 
         # --- Fila 5: Botón ---
         ttk.Button(ncbi_frame, text="Obtener Secuencias", command=self.on_fetch_ncbi).grid(row=5, column=0, columnspan=4, sticky="ew", pady=5)
@@ -134,7 +134,7 @@ class App:
         style.configure("TEntry", fieldbackground=self.colors["panel"], foreground=self.colors["text"], borderwidth=1, insertcolor=self.colors["text"])
         
     def on_limpiar(self):
-        # --- MODIFICADO ---
+        # --- (Esta función no tiene cambios) ---
         self.entry_X.delete(0, tk.END)
         self.entry_Y.delete(0, tk.END)
         self.entry_acc1.delete(0, tk.END)
@@ -145,7 +145,6 @@ class App:
         self.entry_Y_start.delete(0, tk.END)
         self.entry_Y_end.delete(0, tk.END)
         
-        # --- NUEVO (para los 4 campos) ---
         self.entry_fetch1_start.delete(0, tk.END)
         self.entry_fetch1_end.delete(0, tk.END)
         self.entry_fetch2_start.delete(0, tk.END)
@@ -191,8 +190,8 @@ class App:
             messagebox.showerror("Error Inesperado", f"Ocurrió un error: {e}")
             return None, None
 
-    # --- FUNCIÓN on_fetch_ncbi (MODIFICADA) ---
     def on_fetch_ncbi(self):
+        # --- (Esta función no tiene cambios) ---
         acc1 = self.entry_acc1.get().strip()
         acc2 = self.entry_acc2.get().strip()
         
@@ -203,26 +202,20 @@ class App:
         seq1_full, seq2_full = self.fetch_ncbi_sequences(acc1, acc2)
         
         if seq1_full and seq2_full:
-            # --- LÓGICA DE SLICING MODIFICADA ---
             try:
-                # Obtener valores de los índices de carga para la Cadena 1
                 f1_start_str = self.entry_fetch1_start.get()
                 f1_end_str = self.entry_fetch1_end.get()
                 f1_start = int(f1_start_str) if f1_start_str else None
                 f1_end = int(f1_end_str) if f1_end_str else None
 
-                # Obtener valores de los índices de carga para la Cadena 2
                 f2_start_str = self.entry_fetch2_start.get()
                 f2_end_str = self.entry_fetch2_end.get()
                 f2_start = int(f2_start_str) if f2_start_str else None
                 f2_end = int(f2_end_str) if f2_end_str else None
                 
-                # Aplicar el slicing (corte) de forma independiente
                 seq1_sliced = seq1_full[f1_start:f1_end]
                 seq2_sliced = seq2_full[f2_start:f2_end]
-                # --- FIN DE LA LÓGICA MODIFICADA ---
 
-                # Insertar las cadenas YA CORTADAS
                 self.entry_X.delete(0, tk.END)
                 self.entry_X.insert(0, seq1_sliced)
                 self.entry_Y.delete(0, tk.END)
@@ -237,8 +230,8 @@ class App:
                 messagebox.showerror("Error Inesperado", f"Ocurrió un error al cortar las cadenas: {e}")
                 return
 
-    # --- FUNCIÓN AUXILIAR (Sin cambios) ---
     def _get_sliced_strings(self):
+        # --- (Esta función no tiene cambios) ---
         X_full = self.entry_X.get()
         Y_full = self.entry_Y.get()
         
@@ -262,8 +255,8 @@ class App:
             messagebox.showerror("Error de Índice", "Los índices de Inicio/Fin (junto a Cadena 1/2) deben ser números enteros (ej. 5, 10, -1).")
             return None, None
         
-    # --- FUNCIÓN on_calcular (Sin cambios) ---
     def on_calcular(self):
+        # --- (Esta función no tiene cambios) ---
         X, Y = self._get_sliced_strings()
         
         if X is None or Y is None:
@@ -319,8 +312,8 @@ class App:
             else:
                 self.animate_table(X, Y)
 
-    # --- plot_comparison (Sin cambios) ---
     def plot_comparison(self, did_rec, t_rec, t_dyn, mem_rec, mem_dyn):
+        # --- (Esta función no tiene cambios) ---
         fig = Figure(figsize=(6, 5), dpi=100)
         fig.patch.set_facecolor(self.colors["bg"])
 
@@ -355,7 +348,7 @@ class App:
         canvas.draw()
         canvas.get_tk_widget().pack(fill="both", expand=True)
 
-    # --- animate_table (Sin cambios) ---
+    # --- animate_table (MODIFICADA Y CORREGIDA) ---
     def animate_table(self, X, Y):
         if self.anim_after_id:
             self.root.after_cancel(self.anim_after_id)
@@ -365,42 +358,58 @@ class App:
             w.destroy()
 
         m, n = len(X), len(Y)
-        rows, cols = m + 1, n + 1
+        # rows y cols son para la tabla L, que es (m+1) x (n+1)
+        rows, cols = m + 1, n + 1 
         
-        labels = [[None] * cols for _ in range(rows)]
+        # 'labels' almacenará las (m+1)x(n+1) etiquetas de la tabla L
+        labels = [[None] * cols for _ in range(rows)] 
         
-        for i, char in enumerate(X):
-            lbl_h = tk.Label(self.animation_frame, text=char, width=4, height=2,
-                             bg=self.colors["bg"], fg=self.colors["accent2"], font=("Consolas", 9, "bold"))
-            lbl_h.grid(row=i+1, column=0, padx=1, pady=1)
-        
+        # --- 1. Añadir esquina superior-izquierda (vacía) ---
+        # Colocada en (0,0)
+        lbl_corner = tk.Label(self.animation_frame, text=" ", width=4, height=2,
+                              bg=self.colors["bg"], relief="solid", borderwidth=1)
+        lbl_corner.grid(row=0, column=0, padx=1, pady=1)
+
+        # --- 2. Añadir encabezado Y (horizontal) ---
+        # Colocada en (fila 0, col 2), (fila 0, col 3), ...
         for j, char in enumerate(Y):
             lbl_v = tk.Label(self.animation_frame, text=char, width=4, height=2,
                              bg=self.colors["bg"], fg=self.colors["accent2"], font=("Consolas", 9, "bold"))
-            lbl_v.grid(row=0, column=j+1, padx=1, pady=1)
+            lbl_v.grid(row=0, column=j + 2, padx=1, pady=1) # col=j+1
         
-        for i in range(rows):
-            for j in range(cols):
-                if i == 0 or j == 0:
-                    text = "0"
-                    if i == 0 and j == 0: text = " "
-                    lbl = tk.Label(self.animation_frame, text=text, 
-                                   width=4, height=2, relief="solid", borderwidth=1,
-                                   bg=self.colors["panel_right"], fg=self.colors["text"],
-                                   font=("Consolas", 9))
-                else:
-                    lbl = tk.Label(self.animation_frame, text=" ", 
-                                   width=4, height=2, relief="solid", borderwidth=1,
-                                   bg=self.colors["panel"], fg=self.colors["text"],
-                                   font=("Consolas", 9))
-                
-                lbl.grid(row=i, column=j, padx=1, pady=1)
-                if i > 0 or j > 0:
-                    labels[i][j] = lbl
+        # --- 3. Añadir encabezado X (vertical) ---
+        # Colocada en (fila 2, col 0), (fila 3, col 0), ...
+        for i, char in enumerate(X):
+            lbl_h = tk.Label(self.animation_frame, text=char, width=4, height=2,
+                             bg=self.colors["bg"], fg=self.colors["accent2"], font=("Consolas", 9, "bold"))
+            lbl_h.grid(row=i + 2, column=0, padx=1, pady=1) # row=i+1
 
+        # --- 4. Crear celdas de la tabla L[i][j] (m+1)x(n+1) ---
+        # Colocadas en un offset (desplazamiento) de (1,1)
+        for i in range(rows): # i de 0 a m
+            for j in range(cols): # j de 0 a n
+                if i == 0 or j == 0:
+                    text = "0" # Las celdas de la fila/columna 0
+                    # --- CORRECCIÓN DE COLOR ---
+                    bg_color = self.colors["panel"] 
+                else:
+                    text = " " # Celdas de cálculo, inician vacías
+                    bg_color = self.colors["panel"]
+
+                lbl = tk.Label(self.animation_frame, text=text, 
+                               width=4, height=2, relief="solid", borderwidth=1,
+                               bg=bg_color, fg=self.colors["text"],
+                               font=("Consolas", 9))
+                
+                # Colocar L[i][j] en la celda del grid (i+1, j+1)
+                lbl.grid(row=i + 1, column=j + 1, padx=1, pady=1)
+                labels[i][j] = lbl # Guardar la etiqueta en nuestra matriz
+        
+        # --- Lógica de animación (sin cambios) ---
         L = [[0] * (n + 1) for _ in range(m + 1)]
         delay = 80 # ms
 
+        # 'steps' solo itera sobre las celdas de cálculo (no la fila/col 0)
         steps = [(i, j) for i in range(1, m + 1) for j in range(1, n + 1)]
         state = {"index": 0, "steps": steps, "L": L, "labels": labels, "X": X, "Y": Y}
 
@@ -411,17 +420,29 @@ class App:
                     self.anim_after_id = None
                     return
 
-                i, j = state["steps"][idx]
+                i, j = state["steps"][idx] # i, j son de 1 a m/n
+                
+                # labels[i][j] es la etiqueta correcta para L[i][j]
+                if labels[i][j] is None:
+                    # Esto no debería pasar, pero es una guarda de seguridad
+                    state["index"] += 1
+                    self.anim_after_id = self.root.after(delay, step_animation)
+                    return
+
                 if X[i-1] == Y[j-1]:
                     L[i][j] = L[i-1][j-1] + 1
-                    state["labels"][i][j].config(bg=self.colors["cell_match"])
+                    labels[i][j].config(bg=self.colors["cell_match"])
                 else:
                     L[i][j] = max(L[i-1][j], L[i][j-1])
                 
-                state["labels"][i][j].config(text=str(L[i][j]))
+                labels[i][j].config(text=str(L[i][j]))
                 state["index"] += 1
                 self.anim_after_id = self.root.after(delay, step_animation)
             except tk.TclError:
+                # La ventana fue cerrada o el widget destruido
+                self.anim_after_id = None
+            except Exception as e:
+                print(f"Error en step_animation: {e}") 
                 self.anim_after_id = None
                 
         self.anim_after_id = self.root.after(100, step_animation)

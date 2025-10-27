@@ -43,3 +43,4 @@ Despues de ingresar ambas cadenas, se presiona calcular y comparar y comienza la
 Las librerias necesarias para corre el codigo de tratan de:
 
     matplotlib
+    requests

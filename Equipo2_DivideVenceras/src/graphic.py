@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 
-# --- IMPORTACIONES PREVIAS ---
 import requests
 import re
 
@@ -30,33 +29,54 @@ class App:
         left_panel = ttk.Frame(main_frame, style="App.TFrame")
         left_panel.grid(row=0, column=0, sticky="nsew", padx=(0, 10))
 
-        # --- Panel de NCBI (Sin cambios) ---
+        # --- Panel de NCBI (MODIFICADO) ---
         ncbi_frame = ttk.Frame(left_panel, style="App.TFrame")
         ncbi_frame.pack(fill="x", pady=(0, 10))
         
-        ttk.Label(ncbi_frame, text="Obtener de NCBI (Nucleotide DB):", font=("Segoe UI", 10, "bold")).grid(row=0, column=0, columnspan=3, sticky="w", pady=4)
+        ttk.Label(ncbi_frame, text="Obtener de NCBI (Nucleotide DB):", font=("Segoe UI", 10, "bold")).grid(row=0, column=0, columnspan=4, sticky="w", pady=4)
         
+        # --- Fila 1: Acceso 1 ---
         ttk.Label(ncbi_frame, text="Acceso 1:").grid(row=1, column=0, sticky="w", pady=2)
         self.entry_acc1 = ttk.Entry(ncbi_frame, width=20, font=("Segoe UI", 10))
-        self.entry_acc1.grid(row=1, column=1, padx=6, pady=4)
+        self.entry_acc1.grid(row=1, column=1, padx=6, pady=4, columnspan=3, sticky="ew")
         self.entry_acc1.insert(0, "NM_000520.6") 
         
-        ttk.Label(ncbi_frame, text="Acceso 2:").grid(row=2, column=0, sticky="w", pady=2)
+        # --- Fila 2: Rangos Carga 1 ---
+        ttk.Label(ncbi_frame, text="Cargar Inicio 1:").grid(row=2, column=0, sticky="w", padx=(10,0))
+        self.entry_fetch1_start = ttk.Entry(ncbi_frame, width=8, font=("Segoe UI", 10))
+        self.entry_fetch1_start.grid(row=2, column=1, padx=5, pady=2, sticky="w")
+        
+        ttk.Label(ncbi_frame, text="Cargar Fin 1:").grid(row=2, column=2, sticky="w", padx=(10,0))
+        self.entry_fetch1_end = ttk.Entry(ncbi_frame, width=8, font=("Segoe UI", 10))
+        self.entry_fetch1_end.grid(row=2, column=3, padx=5, pady=2, sticky="w")
+        self.entry_fetch1_end.insert(0, "100") # Ejemplo de 100 caracteres
+
+        # --- Fila 3: Acceso 2 ---
+        ttk.Label(ncbi_frame, text="Acceso 2:").grid(row=3, column=0, sticky="w", pady=2)
         self.entry_acc2 = ttk.Entry(ncbi_frame, width=20, font=("Segoe UI", 10))
-        self.entry_acc2.grid(row=2, column=1, padx=6, pady=4)
+        self.entry_acc2.grid(row=3, column=1, padx=6, pady=4, columnspan=3, sticky="ew")
         self.entry_acc2.insert(0, "NM_001126111.3")
 
-        ttk.Button(ncbi_frame, text="Obtener Secuencias", command=self.on_fetch_ncbi).grid(row=1, column=2, rowspan=2, padx=10)
+        # --- Fila 4: Rangos Carga 2 ---
+        ttk.Label(ncbi_frame, text="Cargar Inicio 2:").grid(row=4, column=0, sticky="w", padx=(10,0))
+        self.entry_fetch2_start = ttk.Entry(ncbi_frame, width=8, font=("Segoe UI", 10))
+        self.entry_fetch2_start.grid(row=4, column=1, padx=5, pady=2, sticky="w")
+        
+        ttk.Label(ncbi_frame, text="Cargar Fin 2:").grid(row=4, column=2, sticky="w", padx=(10,0))
+        self.entry_fetch2_end = ttk.Entry(ncbi_frame, width=8, font=("Segoe UI", 10))
+        self.entry_fetch2_end.grid(row=4, column=3, padx=5, pady=2, sticky="w")
+        self.entry_fetch2_end.insert(0, "100") # Ejemplo de 100 caracteres
+
+        # --- Fila 5: Botón ---
+        ttk.Button(ncbi_frame, text="Obtener Secuencias", command=self.on_fetch_ncbi).grid(row=5, column=0, columnspan=4, sticky="ew", pady=5)
         
         ttk.Separator(left_panel, orient='horizontal').pack(fill='x', pady=10)
         
-        # --- Contenedor de entradas (MODIFICADO) ---
+        # --- Contenedor de entradas (Sin cambios) ---
         inputs = ttk.Frame(left_panel, style="App.TFrame")
         inputs.pack(fill="x", pady=(0, 10))
-        # Configurar columnas del grid de inputs
-        inputs.grid_columnconfigure(1, weight=1) # Columna de Entry principal
+        inputs.grid_columnconfigure(1, weight=1) 
         
-        # --- Cadena 1 y sus índices ---
         ttk.Label(inputs, text="Cadena 1:").grid(row=0, column=0, sticky="w", pady=2)
         self.entry_X = ttk.Entry(inputs, width=40, font=("Segoe UI", 10))
         self.entry_X.grid(row=0, column=1, padx=6, pady=4, sticky="ew")
@@ -69,7 +89,6 @@ class App:
         self.entry_X_end = ttk.Entry(inputs, width=6, font=("Segoe UI", 10))
         self.entry_X_end.grid(row=0, column=5, padx=5, pady=4)
 
-        # --- Cadena 2 y sus índices ---
         ttk.Label(inputs, text="Cadena 2:").grid(row=1, column=0, sticky="w", pady=2)
         self.entry_Y = ttk.Entry(inputs, width=40, font=("Segoe UI", 10))
         self.entry_Y.grid(row=1, column=1, padx=6, pady=4, sticky="ew")
@@ -116,20 +135,21 @@ class App:
         
     def on_limpiar(self):
         # --- MODIFICADO ---
-        # Limpiar campos de cadenas
         self.entry_X.delete(0, tk.END)
         self.entry_Y.delete(0, tk.END)
-        
-        # Limpiar campos de acceso
         self.entry_acc1.delete(0, tk.END)
         self.entry_acc2.delete(0, tk.END)
         
-        # --- NUEVO ---
-        # Limpiar campos de índices
         self.entry_X_start.delete(0, tk.END)
         self.entry_X_end.delete(0, tk.END)
         self.entry_Y_start.delete(0, tk.END)
         self.entry_Y_end.delete(0, tk.END)
+        
+        # --- NUEVO (para los 4 campos) ---
+        self.entry_fetch1_start.delete(0, tk.END)
+        self.entry_fetch1_end.delete(0, tk.END)
+        self.entry_fetch2_start.delete(0, tk.END)
+        self.entry_fetch2_end.delete(0, tk.END)
         
         self.result_label.config(text="Resultados aparecerán aquí.")
         for w in self.animation_frame.winfo_children():
@@ -141,12 +161,7 @@ class App:
         # --- (Esta función no tiene cambios) ---
         try:
             base_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
-            params = {
-                "db": "nucleotide",
-                "id": f"{acc1_id},{acc2_id}",
-                "rettype": "fasta",
-                "retmode": "text"
-            }
+            params = { "db": "nucleotide", "id": f"{acc1_id},{acc2_id}", "rettype": "fasta", "retmode": "text" }
             response = requests.get(base_url, params=params, timeout=10)
             response.raise_for_status()
             
@@ -168,9 +183,7 @@ class App:
                 except Exception as e:
                     messagebox.showerror("Error de Parseo", f"No se pudo procesar la secuencia {i+1}: {e}")
                     return None, None
-                    
             return seqs_out[0], seqs_out[1]
-            
         except requests.exceptions.RequestException as e:
             messagebox.showerror("Error de Red", f"No se pudo conectar a NCBI: {e}")
             return None, None
@@ -178,8 +191,8 @@ class App:
             messagebox.showerror("Error Inesperado", f"Ocurrió un error: {e}")
             return None, None
 
+    # --- FUNCIÓN on_fetch_ncbi (MODIFICADA) ---
     def on_fetch_ncbi(self):
-        # --- (Esta función no tiene cambios) ---
         acc1 = self.entry_acc1.get().strip()
         acc2 = self.entry_acc2.get().strip()
         
@@ -187,71 +200,78 @@ class App:
             messagebox.showerror("Entrada Vacía", "Por favor, ingrese ambos Números de Acceso de NCBI.")
             return
             
-        seq1, seq2 = self.fetch_ncbi_sequences(acc1, acc2)
+        seq1_full, seq2_full = self.fetch_ncbi_sequences(acc1, acc2)
         
-        if seq1 and seq2:
-            self.entry_X.delete(0, tk.END)
-            self.entry_X.insert(0, seq1)
-            self.entry_Y.delete(0, tk.END)
-            self.entry_Y.insert(0, seq2)
-            
-            messagebox.showinfo("Éxito", "Secuencias obtenidas y cargadas en 'Cadena 1' y 'Cadena 2'.\nPresione 'Calcular y Comparar'.")
+        if seq1_full and seq2_full:
+            # --- LÓGICA DE SLICING MODIFICADA ---
+            try:
+                # Obtener valores de los índices de carga para la Cadena 1
+                f1_start_str = self.entry_fetch1_start.get()
+                f1_end_str = self.entry_fetch1_end.get()
+                f1_start = int(f1_start_str) if f1_start_str else None
+                f1_end = int(f1_end_str) if f1_end_str else None
 
-    # --- NUEVA FUNCIÓN AUXILIAR ---
+                # Obtener valores de los índices de carga para la Cadena 2
+                f2_start_str = self.entry_fetch2_start.get()
+                f2_end_str = self.entry_fetch2_end.get()
+                f2_start = int(f2_start_str) if f2_start_str else None
+                f2_end = int(f2_end_str) if f2_end_str else None
+                
+                # Aplicar el slicing (corte) de forma independiente
+                seq1_sliced = seq1_full[f1_start:f1_end]
+                seq2_sliced = seq2_full[f2_start:f2_end]
+                # --- FIN DE LA LÓGICA MODIFICADA ---
+
+                # Insertar las cadenas YA CORTADAS
+                self.entry_X.delete(0, tk.END)
+                self.entry_X.insert(0, seq1_sliced)
+                self.entry_Y.delete(0, tk.END)
+                self.entry_Y.insert(0, seq2_sliced)
+                
+                messagebox.showinfo("Éxito", "Secuencias obtenidas y cargadas en 'Cadena 1' y 'Cadena 2'.\nPresione 'Calcular y Comparar'.")
+            
+            except ValueError:
+                messagebox.showerror("Error de Índice de Carga", "Los índices de 'Cargar Inicio' / 'Cargar Fin' deben ser números enteros.")
+                return
+            except Exception as e:
+                messagebox.showerror("Error Inesperado", f"Ocurrió un error al cortar las cadenas: {e}")
+                return
+
+    # --- FUNCIÓN AUXILIAR (Sin cambios) ---
     def _get_sliced_strings(self):
-        """
-        Obtiene las cadenas de los Entry y las corta según los índices.
-        Maneja errores de conversión de índices.
-        """
         X_full = self.entry_X.get()
         Y_full = self.entry_Y.get()
         
         try:
-            # Obtener valores de los índices. Si están vacíos, son None.
             x_start_str = self.entry_X_start.get()
             x_end_str = self.entry_X_end.get()
             y_start_str = self.entry_Y_start.get()
             y_end_str = self.entry_Y_end.get()
 
-            # Convertir a 'int' si no están vacíos, 'None' si lo están.
-            # Python maneja int negativos para slicing (ej. -5)
             x_start = int(x_start_str) if x_start_str else None
             x_end = int(x_end_str) if x_end_str else None
             y_start = int(y_start_str) if y_start_str else None
             y_end = int(y_end_str) if y_end_str else None
             
-            # Aplicar el slicing.
-            # Python maneja los 'None' perfectamente:
-            # X_full[None:10] -> desde el inicio hasta 10
-            # X_full[5:None]  -> desde 5 hasta el final
-            # X_full[None:None] -> la cadena completa
             X = X_full[x_start:x_end]
             Y = Y_full[y_start:y_end]
             
             return X, Y
 
         except ValueError:
-            # Ocurre si el usuario escribe "abc" en un campo de índice
-            messagebox.showerror("Error de Índice", "Los índices de Inicio/Fin deben ser números enteros (ej. 5, 10, -1).")
-            return None, None # Devuelve None para indicar el error
-
-    # --- FUNCIÓN on_calcular (MODIFICADA) ---
+            messagebox.showerror("Error de Índice", "Los índices de Inicio/Fin (junto a Cadena 1/2) deben ser números enteros (ej. 5, 10, -1).")
+            return None, None
+        
+    # --- FUNCIÓN on_calcular (Sin cambios) ---
     def on_calcular(self):
-        # --- MODIFICADO ---
-        # Obtener las cadenas (completas o cortadas) usando la nueva función
         X, Y = self._get_sliced_strings()
         
-        # Si la función devolvió None, hubo un error de índice (ej. "abc")
         if X is None or Y is None:
             return 
-
-        # Si las cadenas están vacías (ya sea por entrada o por slicing)
         if not X or not Y:
             messagebox.showerror("Error", "Ingresa ambas cadenas, o verifica que los índices no resulten en una cadena vacía.")
             return
-        # --- FIN DE MODIFICACIÓN ---
 
-        # Limpiar animación y gráficas previas
         for w in self.animation_frame.winfo_children():
             w.destroy()
         for w in self.right_panel.winfo_children():
@@ -262,7 +282,6 @@ class App:
         else:
             do_rec = True
 
-        # Ejecutar recursivo
         t_rec, peak_rec, lcs_rec = None, None, None
         result_text_parts = []
         if do_rec:
@@ -280,7 +299,6 @@ class App:
         else:
             result_text_parts.append("• Recursivo: Saltado por ser muy costoso.")
 
-        # Ejecutar dinámico
         tracemalloc.start()
         t0 = time.perf_counter()
         L_full, lcs_len = lcs.lcs_dinamico_tabla(X, Y)
@@ -289,23 +307,20 @@ class App:
         tracemalloc.stop()
         result_text_parts.append(f"• Dinámico: {lcs_len} (len) | {t_dyn:.5f}s | {peak_dyn:.1f} KB")
 
-        # Reconstruir subsecuencia
         lcs_string = lcs.reconstruir_lcs(L_full, X, Y)
         result_text_parts.append(f"↳ Subsecuencia: '{lcs_string}'")
         self.result_label.config(text="\n".join(result_text_parts))
 
-        # Graficar
         self.plot_comparison(do_rec, t_rec, t_dyn, peak_rec, peak_dyn)
 
-        # Animar
         if self.anim_var.get():
             if len(X) > 50 or len(Y) > 50:
                  messagebox.showwarning("Animación Saltada", "La animación de la tabla se salta para cadenas de más de 50 caracteres para evitar problemas de rendimiento.")
             else:
                 self.animate_table(X, Y)
 
+    # --- plot_comparison (Sin cambios) ---
     def plot_comparison(self, did_rec, t_rec, t_dyn, mem_rec, mem_dyn):
-        # --- (Esta función no tiene cambios) ---
         fig = Figure(figsize=(6, 5), dpi=100)
         fig.patch.set_facecolor(self.colors["bg"])
 
@@ -340,8 +355,8 @@ class App:
         canvas.draw()
         canvas.get_tk_widget().pack(fill="both", expand=True)
 
+    # --- animate_table (Sin cambios) ---
     def animate_table(self, X, Y):
-        # --- (Esta función no tiene cambios) ---
         if self.anim_after_id:
             self.root.after_cancel(self.anim_after_id)
             self.anim_after_id = None

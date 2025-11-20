@@ -1,0 +1,9 @@
+Equipo dinamita. 
+
+Alumnos
+De la Mora Villaseñor Diego Gabriel
+Lopez Esparza Angel Emanuel
+Lopez Galván Melanie Montserrat
+
+Al implementar el algoritmo de Huffman como uso de técnica voraz en el previo algoritmo LCS vamos a comprimir las cadenas que representan el ADN y, 
+a partir de este comprimido vamos a encontrar la subcadena más larga, esperando un resultado más rápido al encontrarlas.

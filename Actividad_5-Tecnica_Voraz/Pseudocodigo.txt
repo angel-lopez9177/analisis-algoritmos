@@ -1,0 +1,70 @@
+PROGRAMA Huffman
+
+INICIO
+    // --- Fase 1: Inicialización y Conteo ---
+    
+    // Proceso: Leer el archivo de entrada
+    texto_completo = LEER_ARCHIVO("libro.txt")
+    
+    // Proceso: Contar la frecuencia de cada carácter
+    mapa_frecuencias = CALCULAR_FRECUENCIAS(texto_completo)
+    
+    // Proceso: Crear la cola de prioridad
+    cola_prioridad = INICIALIZAR_COLA_PRIORIDAD() // (Ordena por menor frecuencia)
+
+    // Proceso: Crear nodos hoja y añadirlos a la cola
+    PARA CADA (caracter, frecuencia) EN mapa_frecuencias:
+        nodo_hoja = CREAR_NODO_HOJA(caracter, frecuencia)
+        INSERTAR_EN_COLA(cola_prioridad, nodo_hoja)
+    FIN PARA
+
+    // --- Fase 2: Construcción del Árbol ---
+    
+    // Conector 1
+    MIENTRAS TAMAÑO(cola_prioridad) > 1:
+        // Decisión: ¿Hay más de 1 nodo en la cola? (Sí)
+        
+        // Proceso: Sacar los dos nodos con menor frecuencia
+        nodo_A = EXTRAER_MIN(cola_prioridad)
+        nodo_B = EXTRAER_MIN(cola_prioridad)
+        
+        // Proceso: Crear un nuevo nodo padre
+        frec_padre = nodo_A.frecuencia + nodo_B.frecuencia
+        nodo_padre = CREAR_NODO_PADRE(frec_padre)
+        
+        // Proceso: Asignar los nodos extraídos como hijos
+        nodo_padre.hijo_izquierdo = nodo_A
+        nodo_padre.hijo_derecho = nodo_B
+        
+        // Proceso: Insertar el nuevo padre en la cola
+        INSERTAR_EN_COLA(cola_prioridad, nodo_padre)
+    
+    FIN MIENTRAS // (Ahora solo queda 1 nodo en la cola)
+
+    // Decisión: ¿Hay más de 1 nodo en la cola? (No)
+    // Proceso: El único nodo que queda es la raíz
+    raiz_arbol = EXTRAER_MIN(cola_prioridad) 
+    
+    // --- Fase 3: Generación de Códigos y Uso ---
+    
+    // Conector 2
+    // Proceso: Asignar el nodo restante como Raíz del Árbol
+    ASIGNAR_RAIZ_GLOBAL(raiz_arbol)
+    
+    // Proceso: Generar los códigos (usando un recorrido DFS)
+    mapa_codigos = GENERAR_CODIGOS_BINARIOS(raiz_arbol, "") // Recorrido DFS
+    
+    // (Aquí iría el paso de CODIFICAR el "libro.txt" a "archivo_comprimido.huff" 
+    // usando el mapa_codigos, aunque tu diagrama salta a la decodificación)
+    
+    // Proceso: Decodificar
+    DECODIFICAR_ARCHIVO("archivo_comprimido.huff", "archivo_decodificado.txt", raiz_arbol)
+    
+    // Proceso: Calcular tamaños
+    tamaño_original = OBTENER_TAMAÑO_ARCHIVO("libro.txt")
+    tamaño_comprimido = OBTENER_TAMAÑO_ARCHIVO("archivo_comprimido.huff")
+    
+    // Datos (Salida): Mostrar la comparación
+    IMPRIMIR_COMPARACION(tamaño_original, tamaño_comprimido)
+
+FIN

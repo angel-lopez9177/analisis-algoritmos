@@ -42,7 +42,11 @@ Para la ejecución del programa, es necesario ejecutar el programa main.py, en d
 
 ![Imagen de la vista inicial](./img/ejecución.png)
 
-Despues de ingresar ambas cadenas, se presiona calcular y comparar y comienza la busqueda de coincidencias en la cadena.
+para la comparación de 2 cadenas, es necesario descargar 2 archivos en formato FASTA. se pueden encontrar este tipo de archivos en la base de datos [NCBI](https://www.ncbi.nlm.nih.gov/datasets/genome/)
+Selecciona ambos archivos y usa un rango de comparación de los genomas. 
+Presiona uno de los botones que representan cada uno de los algoritmos y espera los resultados.
+ 
+ *El algoritmos de fuerza no debe de usarse con rangos mayores a 20 caracteres
 
 ## 2.1. Librerias
 Las librerias necesarias para corre el codigo de tratan de:

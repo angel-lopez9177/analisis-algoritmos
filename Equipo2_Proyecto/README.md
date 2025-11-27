@@ -4,6 +4,7 @@
     - [1.1.2. Conquistar](#112-conquistar)
     - [1.1.3. Combinar](#113-combinar)
   - [1.2. Programación dinamica](#12-programación-dinamica)
+  - [1.3 Fuerza bruta](#13-fuerza-bruta)
 - [2. Ejecución](#2-ejecución)
   - [2.1. Librerias](#21-librerias)
 
@@ -32,10 +33,14 @@ Si no coinciden, el problema se divide en dos subproblemas: encontrar la LCS de 
  ## 1.2. Programación dinamica
  La programación dinámica soluciona la ineficiencia de la versión recursiva construyendo la solución de abajo hacia arriba (bottom-up). Almacena los resultados de los subproblemas en una tabla (matriz) para evitar volver a calcularlos.
 
+ ## 1.3 Fuerza bruta
+
+Comparación de cada una de las cadenas de manera recursiva, en donde al haber caracteres que no son iguales, dividimos el problema en 2 ramas, analizando cada nueva rama hasta el ultimo de los caracteres.
+
  # 2. Ejecución
 Para la ejecución del programa, es necesario ejecutar el programa main.py, en donde se encuentra la vista inicial donde se puede colocar la entrada de los datos.
 
-![Imagen de la vista inicial](./img/VistaInicial.png)
+![Imagen de la vista inicial](./img/ejecución.png)
 
 Despues de ingresar ambas cadenas, se presiona calcular y comparar y comienza la busqueda de coincidencias en la cadena.
 
@@ -43,4 +48,5 @@ Despues de ingresar ambas cadenas, se presiona calcular y comparar y comienza la
 Las librerias necesarias para corre el codigo de tratan de:
 
     matplotlib
-    requests
+    pyside6
+    bio
